@@ -1,6 +1,6 @@
-package org.sopt.dto.Response;
+package org.sopt.dto.response;
 
-class CreatePostResponse {
+public class CreatePostResponse {
     public Long id;
     public String message;
 
