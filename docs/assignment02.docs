@@ -1,0 +1,97 @@
+#HTTP의 멱등성(Idempotency)이란 무엇인가요? GET, POST, PUT, DELETE 중 멱등한 메서드는 무엇인가요?
+##HTTP의 멱등성(Idempotency)
+- 같은 요청을 몇 번을 해도 변하지 않는 성질
+
+### 멱등한 메서드
+- PUT, DELETE, GET은 멱등
+
+
+### POST가 멱등 하지않은 이유?
+- 게시글 작성 요청을 3번 보내면 게시글이 3개 생김.
+
+# @Controller와 @RestController의 차이는 무엇인가요?
+@RestController = @Controller + @ResponseBody
+
+## @Controller
+- 메서드가 반환하는 값을 뷰 이름(HTML 파일) 으로 해석
+- SSR 방식에서 씀
+
+## @ResponseBody
+- JAVA (반환 값) -> JSON 으로 변환한 후 응답 Body에 실어나른다.
+
+## 차이점
+목적)
+- @Controller: 주로 HTML 웹 페이지를 렌더링
+- @ResponseBody: RESTful 웹 서비스 및 API 개발
+반환)
+- String 반환 -> 뷰 리졸버 개입 -> .html, .jsp같은 템플릿 파일을 찾아서 렌더링
+- 객체를 반환 -> 자동으로 JSON/XML 등으로 직렬화되어 HTTP 응답 본문(Body)에 기록
+
+# Java Record란 무엇인가요? 기존 클래스와 비교해서 어떤 점이 다른가요?
+## 쓰는 이유
+- 주로 간단하게 데이터를 저장하고 옮기는 역할
+- 즉, DTO에 주로 사용
+- 일시적으로 데이터를 저장하고 싶은 경우
+- 데이터를 저장할 때 코드의 양을 줄이고 싶을 때
+- 불변적인 데이터를 저장할 때
+
+## 장점
+- 생성자, getter, hashCode(), equals() ,toString()를 제공
+- custom이 필요하다면 record안에 정의해서 사용할 수 있음
+
+##특징
+- 생성자, toString()은 모든 field를 포함
+- getter는 field이름과 유사한 이름으로 생성 ex) id(), email()...
+- 다른 class 상속 xx
+- class가 final
+- 모든 필드는 불편이라 setter xxx
+
+##문법
+record만 적어주면 된다
+public record User(Long id, int age){}
+
+
+# Optional이란 무엇이고, 왜 null 대신 쓰는 건가요?
+- 개발 할 때 가장 많이 발생하는 예외는  NPE(NullPointerException) 이다. NPE을 피하려면 null여부를 검사 해야하는데 검사를 해야하는 변수가 너무 많을 경우
+코드가 복잡해지고 번거롭다.
+- 따라서 NPE를 방지하기 위해 Optinal을 사용한다
+- Optional은 값이 있을 수도 있고, 없을 수도(null) 있는 상태를 나타내는 데이터 타입인데 이걸 하면 NPE 예외처리가 알아서 된다
+
+# Spring Bean의 생명주기란 무엇인가요?
+
+## Bean
+- Spring 컨테이너에서 관리되는 모든 객체
+- 애플리케이션의 다양한 컴포넌들 간의 의존성을 정의하고 관리하는 역할
+
+## 생명주기 (싱글톤)
+- 스프링 컨테이너 생성 ➡️ 스프링 빈 생성 ➡️ 의존관계 주입 ➡️ 초기화 롤백 ➡️ 사용 ➡️ 소멸 전 콜백 ➡️ 스프링 종료
+
+1. Bean 인스턴스화
+    - 스프링 IOC(제어역전) 컨테이너는 XML 파일 또는 Java 설정 파일에서 정의된 Bean을 인스턴스화
+2. 의존성 주입
+    - Bean 정의에 따라 의존성이 주입, Spring은 필요한 속성이나 의존성을 주입하여 Bean을 완전히 구성
+3. setBeanName() 호출:
+    - Bean이 BeanNameAware 인터페이스를 구현한 경우, Spring은 setBeanName() 메서드를 호출하여 Bean의 ID를 전달
+4. setBeanFactory() 호출:
+    - Bean이 BeanFactoryAware 인터페이스를 구현한 경우, setBeanFactory() 메서드가 호출되어 Spring BeanFactory의 인스턴스가 전달
+5. preProcessBeforeInitialization()
+   Bean과 연관된 BeanPostProcessor가 있다면, postProcessBeforeInitialization() 메서드가 초기화 전 호출
+6. 초기화 메서드 호출:
+   Bean 정의에서 init-method가 지정된 경우, 이 초기화 메서드가 호출
+7 postProcessAfterInitialization() 호출:
+   초기화 후에 실행할 작업이 있는 경우, BeanPostProcessor의 postProcessAfterInitialization() 메서드가 호출
+   이 과정이 완료되면, Bean은 사용 가능한 상태가 되어 애플리케이션에서 사용되는 데 Spring 컨테이너가 종료될 때, Bean이 DisposableBean 인터페이스를 구현한 경우 destroy() 메서드가 호출되거나, destroy-method로 지정된 메서드가 호출되어 Bean이 소멸
+
+# Spring Boot의 구동 원리를 DispatcherServlet 동작 방식 위주로 정리해주세요
+- Spring Boot는 내장 WAS(톰캣)을 통해 구동되는데 모든 요청은 프론트 컨트롤러인 DispatcherServlet이 가장 먼저 받아 처리된다.
+이 서블릿은 HandlerMapping으로 적절한 컨트롤러를 찾고, HandlerAdapter를 통해 해당 컨트롤러의 메소드를 실행하여 요청을 처리한 후, 결과(View 또는 Data)를 반환하는 구조
+
+##순서
+1. 클라이언트의 요청을 Dispatcher Servlet이 가장 먼저 받는다
+2. 요청 정보를 통해 요청을 위임할 컨트롤러를 Dispatcher Servlet가 찾고, 해당 객체의 메소드를 호출
+3. 요청을 컨트롤러로 위임할 핸들러 어댑터 (Handler Adapter)를 찾아서 전달
+4. 핸들러 어댑터가 컨트롤러로 요청을 위임
+5. 우리가 작성한 비즈니스 로직을 처리
+6. 컨트롤러가 반환값을 반환
+7. 핸들러 어댑터가 반환값을 처리
+8. 서버의 응답을 클라이언트로 반환
