@@ -2,6 +2,8 @@ package org.sopt.dto.response;
 
 import org.sopt.Domain.Post;
 
+import java.util.Optional;
+
 public class PostResponse {
     private Long id;          // 게시글 상세 화면 — 특정 게시글 식별용
     private String title;     // 목록, 상세, 글쓰기 화면 — 제목
@@ -17,6 +19,31 @@ public class PostResponse {
         this.createdAt = post.getCreatedAt();
     }
 
+    public static PostResponse From(Optional<Post> post) {
+        return new PostResponse(post.get());
+    }
+
+
+    //getter가 없으니까 PostList가 반환되지 않았었다..
+    public Long getId() {
+        return id;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public String getContent() {
+        return content;
+    }
+
+    public String getAuthor() {
+        return author;
+    }
+
+    public String getCreatedAt() {
+        return createdAt;
+    }
 
     public String toString() {
         return "[" + id + "] " + title + " - " + author + " (" + createdAt + ")\n" + content;
