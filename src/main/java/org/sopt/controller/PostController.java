@@ -1,8 +1,5 @@
 package org.sopt.controller;
 
-
-
-
 import org.sopt.dto.request.CreatePostRequest;
 import org.sopt.dto.request.UpdatePostRequest;
 import org.sopt.exception.ApiResponse;
