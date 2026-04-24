@@ -15,7 +15,7 @@ import java.util.List;
 
 
 //그냥 “요청 받아서 넘기고, 결과 받아서 응답하는” 얇은 계층
-//비즈니스 로직 직접 처리 xxx
+//비즈니스 로직 직접 처리 xx
 //비즈니스 로직은 Service에게, 데이터 저장은 Repository에게 위임해요. Controller 자체는 최대한 얇게 유지
 
 @RestController //이걸 쓰면 자동으로 JSON으로 만들어서 스프링이 반환한다.
