@@ -1,26 +1,23 @@
 package org.sopt.dto.request;
 
-public class CreatePostRequest {
-    private String title; //get이 있으니까 접근 제어자를 private로 해도 됨.
-    private String content;
-    private String author;
+import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 
-    public String getTitle() {
-        return title;
-    }
+public record CreatePostRequest(
+        @Schema(description = "게시글 제목 (최대 50자)", example = "오늘 학식 뭐임")
+        @NotBlank(message = "제목은 필수입니다.")
+        @Size(max = 50, message = "제목은 50자를 초과할 수 없습니다.")
+        String title,
 
-    public String getContent() {
-        return content;
-    }
+        @Schema(description = "게시글 내용 (최대 500자)", example = "돈까스래")
+        @NotBlank(message = "내용은 필수입니다.")
+        @Size(max = 500, message = "내용은 500자를 초과할 수 없습니다.")
+        String content,
 
-    public String getAuthor() {
-        return author;
-    }
-
-
-    public CreatePostRequest(String title, String content, String author) {
-        this.title = title;
-        this.content = content;
-        this.author = author;
-    }
+        @Schema(description = "작성자 ID", example = "1")
+        @NotNull(message = "작성자 ID는 필수입니다.")
+        Long userId
+) {
 }

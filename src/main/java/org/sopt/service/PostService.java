@@ -1,92 +1,74 @@
 package org.sopt.service;
 
 import org.sopt.Domain.Post;
+import org.sopt.Domain.User;
 import org.sopt.Repository.PostRepository;
+import org.sopt.Repository.UserRepository;
 import org.sopt.dto.request.CreatePostRequest;
 import org.sopt.dto.request.UpdatePostRequest;
 import org.sopt.dto.response.*;
-import org.sopt.exception.ApiResponse;
-import org.sopt.exception.PostNotFoundException;
-import org.sopt.exception.Validator;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import org.sopt.global.api.exception.NotFoundException;
+import org.sopt.global.api.code.ErrorCode;
 import org.springframework.stereotype.Service;
-
-import java.time.LocalDateTime;
-import java.util.ArrayList;
+import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
-import java.util.Optional;
-
-//과제
-// @Service + Spring DI, 반환 타입이 void → DTO
 
 @Service
 public class PostService {
-    private final PostRepository postRepository; // Spring이 주입해준다
+    private final PostRepository postRepository;
+    private final UserRepository userRepository;
 
-    //세미나에서 lombok 이용하지 마라고 하셔서...
-    public PostService (PostRepository postRepository){
+    public PostService(
+            PostRepository postRepository,
+            UserRepository userRepository
+    ) {
         this.postRepository = postRepository;
+        this.userRepository = userRepository;
     }
 
     // CREATE
+    @Transactional  // 저장 → DB 변경 발생 → 트랜잭션 커밋 시 반영
     public CreatePostResponse createPost(CreatePostRequest request) {
 
+        User user = userRepository.findById(request.userId())
+                .orElseThrow(() -> new NotFoundException(ErrorCode.USER_NOT_FOUND));
+        Post post = new Post(request.title(), request.content(), user);
 
-        Validator.TitleValidator(request.getTitle());
-        Validator.ContentValidator(request.getContent());
-
-
-        LocalDateTime createdAt = java.time.LocalDateTime.now();
-        Post post = new Post(postRepository.generateId(), request.getTitle(), request.getContent(), request.getAuthor(), createdAt);
-
-        postRepository.save(post);
+        postRepository.save(post);  // 영속성 컨텍스트에 올라감 → 커밋 시 INSERT
         return new CreatePostResponse(post.getId(), "게시글 등록 완료!");
     }
 
-
-    // 자유게시판 목록 화면에서 호출돼요
+    @Transactional(readOnly = true)
     public List<PostResponse> getAllPosts() {
-        List<PostResponse> responses = new ArrayList<>();
-        List<Post> getPostList = postRepository.findAll();
-        if (getPostList.isEmpty()) {
-             ResponseEntity.status(HttpStatus.CREATED).body(ApiResponse.error("게시글을 찾을 수 없습니다.", HttpStatus.NOT_FOUND));
-        } else {
-            for (Post post: getPostList){
-                responses.add(new PostResponse(post));
-            }
-        }
-        return responses;
+        return postRepository.findAll()
+                .stream()
+                .map(PostResponse::from)
+                .toList();
     }
 
-
+    @Transactional(readOnly = true) // 조회 전용 → 더티 체킹 안 함 → 성능 최적화
     public PostResponse getPost(Long id) {
-        Optional<Post> post = Optional.of(postRepository.findById(id)
-                .orElseThrow(() -> new PostNotFoundException(id)));
-        return PostResponse.From(post);
+        Post post = postRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException(ErrorCode.POST_NOT_FOUND));
+
+        return PostResponse.from(post);
     }
 
-    public UpdatePostResponse updatePost(Long id, UpdatePostRequest request){
-
-
-        Optional<Post> findPost = postRepository.findById(id);
-
-
-        Post post = findPost.orElseThrow(() ->  new PostNotFoundException(id));
-
-        Validator.TitleValidator(request.getTitle());
-        Validator.ContentValidator(request.getContent());
-
+    @Transactional  // 변경 → 더티 체킹으로 save() 없이 자동 UPDATE
+    public PostResponse updatePost(Long id, UpdatePostRequest request) {
+        Post post = postRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException(ErrorCode.POST_NOT_FOUND));
         post.update(request.getTitle(), request.getContent());
-
-        return new UpdatePostResponse(post.getId(), "게시글 수정 완료!");
+        // save() 호출 없어도 트랜잭션 커밋 시 UPDATE 쿼리 자동 실행
+        return PostResponse.from(post);
     }
 
-    public void deletePost(Long id)  {
-        boolean isDelted = postRepository.deleteById(id);
-        if (!isDelted) {
-            throw new PostNotFoundException(id);
-        }
+    // DELETE 📝 과제
+    @Transactional
+    public void deletePost(Long id) {
+        postRepository.deleteById(id);
+
     }
+
 
 }

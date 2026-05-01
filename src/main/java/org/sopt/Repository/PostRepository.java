@@ -1,40 +1,16 @@
 package org.sopt.Repository;
 
 import org.sopt.Domain.Post;
-import org.springframework.stereotype.Repository;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 
-//데이터를 저장하고 꺼내는 일만 한다
-@Repository
-public class PostRepository {
-    private static List<Post> postList = new ArrayList<>();
-
-    private Long nextId = 1L;
-
-    public Post save(Post post) {
-        postList.add(post);
-        return post;
-    }
-
-    public List<Post> findAll() {
-        return postList;
-    }
-
-    public Optional<Post> findById(Long id) {
-        return postList.stream()
-                .filter(p -> p.getId().equals(id))
-                .findFirst();
-    }
-
-    public boolean deleteById(Long id) {
-        return postList.removeIf(p -> p.getId().equals(id));
-    }
-
-    public Long generateId() {
-        return nextId++;
-    }
+//여기에 레포지토리 어노테이션 안적어도 됨
+//왜냐면 상속해주면 Spring이 알아서 Bean에 올려줌
+public interface PostRepository extends JpaRepository<Post, Long> {
+    // save, findById, findAll, delete... 자동으로 제공돼요
+    @Query("SELECT p FROM Post p JOIN FETCH p.user WHERE p.deletedAt IS NULL")
+    List<Post> findAllWithUser();
 }
