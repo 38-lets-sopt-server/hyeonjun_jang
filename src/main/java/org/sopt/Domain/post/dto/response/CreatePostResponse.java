@@ -1,4 +1,4 @@
-package org.sopt.dto.response;
+package org.sopt.Domain.post.dto.response;
 
 public class CreatePostResponse {
     public Long id;

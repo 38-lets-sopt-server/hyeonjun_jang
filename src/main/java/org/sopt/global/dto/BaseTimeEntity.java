@@ -1,4 +1,4 @@
-package org.sopt.dto;
+package org.sopt.global.dto;
 
 
 import jakarta.persistence.EntityListeners;

@@ -1,4 +1,4 @@
-package org.sopt.dto.request;
+package org.sopt.Domain.post.dto.request;
 
 public class UpdatePostRequest {
     private String title;

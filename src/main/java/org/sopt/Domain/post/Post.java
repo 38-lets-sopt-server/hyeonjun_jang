@@ -1,8 +1,9 @@
-package org.sopt.Domain;
+package org.sopt.Domain.post;
 import jakarta.persistence.*;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.Where;
-import org.sopt.dto.BaseTimeEntity;
+import org.sopt.Domain.user.entity.User;
+import org.sopt.global.dto.BaseTimeEntity;
 
 import java.time.LocalDateTime;
 

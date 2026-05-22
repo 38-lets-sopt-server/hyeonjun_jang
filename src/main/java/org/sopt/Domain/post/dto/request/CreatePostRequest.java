@@ -1,8 +1,7 @@
-package org.sopt.dto.request;
+package org.sopt.Domain.post.dto.request;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 
 public record CreatePostRequest(
@@ -14,10 +13,6 @@ public record CreatePostRequest(
         @Schema(description = "게시글 내용 (최대 500자)", example = "돈까스래")
         @NotBlank(message = "내용은 필수입니다.")
         @Size(max = 500, message = "내용은 500자를 초과할 수 없습니다.")
-        String content,
-
-        @Schema(description = "작성자 ID", example = "1")
-        @NotNull(message = "작성자 ID는 필수입니다.")
-        Long userId
+        String content
 ) {
 }
