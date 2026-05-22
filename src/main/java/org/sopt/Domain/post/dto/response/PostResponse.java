@@ -1,9 +1,8 @@
-package org.sopt.dto.response;
+package org.sopt.Domain.post.dto.response;
 
-import org.sopt.Domain.Post;
+import org.sopt.Domain.post.Post;
 
 import java.time.LocalDateTime;
-import java.util.Optional;
 
 public record PostResponse(
         String title,
